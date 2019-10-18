@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="memberMapper">
+
+	<select id="memberLogin" parameterType="MemberVO"
+		resultType="MemberVO">
+		/* memberMapper.memberLogin */
+		SELECT M.member_no, M.member_id, M.member_pw, M.member_mname, M.member_phonenumber,
+		       C.car_no, C.car_id, C.car_type, C.car_color
+		FROM MEMBER M
+		JOIN CAR C
+		ON M.member_no = C.member_no
+		WHERE M.member_id = #{member_id} 
+		AND	M.member_pw = #{member_pw}
+	</select>
+
+	<select id="dupcheck" resultType="MemberVO">
+		/* memberMapper.dupcheck */
+		SELECT member_id 
+		FROM MEMBER
+		WHERE member_id = #{member_id}
+	</select>
+
+	<insert id="addMember" parameterType="MemberVO">
+		/* memberMapper.addMember */
+		INSERT ALL 
+		INTO MEMBER(member_no, member_id, member_pw,	member_mname, member_phonenumber)
+		VALUES ((SELECT NVL(MAX(member_no), 0) + 1 FROM MEMBER), 
+		        #{member_id}, #{member_pw}, #{member_mname}, #{member_phonenumber})
+		INTO CAR (car_no, car_type, car_id, car_color, member_no)
+		VALUES ((SELECT NVL(MAX(car_no), 0) + 1 FROM CAR),
+		        #{car_type}, #{car_id}, #{car_color}, (SELECT NVL(MAX(member_no), 0) + 1 FROM MEMBER))
+		SELECT * FROM DUAL
+	</insert>
+
+	<select id="getMemberReserveList" resultType="ReservationVO">
+		/* memberMapper.getMemberReserveList */
+		SELECT RS.reservation_no, B.bodyshop_name, RS.repaired_person,
+		       RS.reservation_time, RS.repaired_time, RS.key,
+		       RP.tire, RP.wiper, RP.cooler, RP.engine_oil
+		FROM RESERVATION RS
+		LEFT JOIN MEMBER M
+		ON RS.member_no = M.member_no
+		LEFT JOIN REPAIREDLIST RP
+		ON RS.reservation_no =	RP.reservation_no
+		JOIN BODYSHOP B
+		ON B.bodyshop_no = RS.bodyshop_no
+		WHERE M.member_no = (SELECT member_no FROM MEMBER WHERE member_id= #{member_id})
+		ORDER BY reservation_no DESC
+	</select>
+
+	<update id="updateMember" parameterType="MemberVO">
+		/* memberMapper.updateMember */
+		UPDATE MEMBER
+		SET	member_pw = #{member_pw}, member_mname = #{member_mname}, member_phonenumber = #{member_phonenumber} 
+		WHERE member_id = #{member_id}
+	</update>
+	
+	<update id="updateCar" parameterType="CarVO">
+		/* memberMapper.updateCar */
+		UPDATE CAR
+		SET car_id = #{car_id}, car_color = #{car_color}, car_type = #{car_type}
+		WHERE member_no = (SELECT member_no FROM MEMBER WHERE member_id = #{member_id})
+	</update>
+
+	<select id="getNotificationList" resultType="com.chavis.biz.vo.NotificationVO">
+		/* memberMapper.getNotificationList */
+		SELECT *
+		FROM NOTIFICATION N
+		JOIN MEMBER M
+		ON N.member_no =
+		M.member_no
+		WHERE M.member_no = (SELECT member_no FROM MEMBER WHERE member_id = #{member_id})
+		ORDER BY notification_time DESC
+	</select>
+		
+	<select id="findMemberID" parameterType="map" resultType="String">
+		SELECT member_id 
+		FROM MEMBER
+		WHERE member_mname = #{member_mname}
+		AND member_phonenumber = #{member_phonenumber}
+	</select>
+	
+	<select id="findMemberPW" parameterType="map" resultType="String">
+		SELECT member_pw 
+		FROM MEMBER
+		WHERE member_mname = #{member_mname}
+		AND member_phonenumber = #{member_phonenumber}
+		AND member_id = #{member_id}
+	</select>
+</mapper>

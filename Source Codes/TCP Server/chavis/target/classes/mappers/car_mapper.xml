@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="carMapper">
+
+	<!-- CREATE -->
+	<insert id="addCar" parameterType="CarVO">
+		INSERT INTO car(car_no, car_type, tire_change_distance, wiper_change_distance, engine_oil_viscosity, distance, car_id, car_color, cooler_left, member_no) 
+		VALUES(#{car_no}, #{car_type}, #{tire_change_distance}, #{wiper_change_distance}, #{engine_oil_viscosity}, #{distance}, #{car_id}, #{car_color}, #{cooler_left}, #{member_no})
+	</insert>
+
+	<!-- READ -->
+	<select id="getCar" resultType="CarVO">
+		SELECT * FROM car WHERE car_no = #{car_no}
+	</select>
+	<select id="getCarList" resultType="CarVO">
+		SELECT * FROM car ORDER BY car_no DESC
+	</select>
+
+	<!-- UPDATE -->
+	<update id="updateTireDistance" parameterType="CarVO">
+		UPDATE car SET tire_change_distance=#{tire_change_distance} WHERE car_no=#{car_no}
+	</update>
+	<update id="updateWiperDistance" parameterType="CarVO">
+		UPDATE car SET wiper_change_distance=#{wiper_change_distance} WHERE car_no=#{car_no}
+	</update>
+	<update id="updateCooler" parameterType="CarVO">
+		UPDATE car SET cooler_left=#{cooler_left} WHERE car_no=#{car_no}
+	</update>
+	<update id="updateEngineOil" parameterType="CarVO">
+		UPDATE car SET engine_oil_viscosity=#{engine_oil_viscosity} WHERE car_no=#{car_no}
+	</update>
+	<update id="updateDistance" parameterType="CarVO">
+		UPDATE car SET distance=#{distance} WHERE car_no=#{car_no}
+	</update>
+
+	<!-- DELETE -->
+	<delete id="removeCar">
+		DELETE FROM car WHERE car_no = #{car_no}
+	</delete>
+	
+	<!-- GET CAR_NO -->
+	<select id="getCarNo" parameterType="String" resultType="Integer">
+		SELECT car_no FROM car WHERE car_id = #{car_id}
+	</select>
+</mapper>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reservationMapper">
+
+	<!-- CREATE -->
+	<insert id="addReservation" parameterType="map">
+		/* reservationMapper.addReservation */
+		MERGE INTO 
+		RESERVATION USING 
+		DUAL ON ( reservation_time = #{reservation_time} and bodyshop_no= #{bodyshop_no} ) 
+		WHEN NOT MATCHED THEN 
+		INSERT ( reservation_no, bodyshop_no, member_no, key, reservation_time, repaired_time ) 
+		VALUES ((SELECT NVL(MAX(reservation_no), 0) + 1 FROM RESERVATION),#{bodyshop_no},
+		        (SELECT member_no FROM MEMBER WHERE member_id =#{member_id}),#{key},
+		        #{reservation_time}, #{repaired_time})
+	</insert>
+
+	<!-- getReservationByBodyshopNo -->
+	<select id="getReservationByBodyshopNo" resultType="ReservationVO">
+		/* reservationMapper.getReservationByBodyshopNo */
+		SELECT * 
+		FROM RESERVATION
+		WHERE bodyshop_no = #{bodyshop_no}
+	</select>
+
+
+	<select id="getReservationForWeb" resultType="WebTableVO">
+		/* reservationMapper.getReservationForWeb */
+		SELECT reservation_time, member_mname, REGEXP_REPLACE(member_phonenumber,'(02|.{3})(.+)(.{4})', '\1-\2-\3') member_phonenumber, car_id, car_type, key, repaired_person, repaired_time
+		FROM MEMBER
+		JOIN RESERVATION
+		ON MEMBER.member_no = RESERVATION.member_no
+		JOIN CAR
+		ON MEMBER.member_no = CAR.member_no
+		JOIN BODYSHOP
+		ON RESERVATION.bodyshop_no = BODYSHOP.bodyshop_no
+		WHERE BODYSHOP.bodyshop_no = #{bodyshop_no}
+
+	</select>
+	<!-- ListByID -->
+	<select id="listReservationByID" parameterType="String"	resultType="ReservationVO">
+		/* reservationMapper.listReservaitonByID */
+		SELECT RESERVATION.reservation_time, MEMBER.member_mname, RESERVATION.key,
+		       RESERVATION.repaired_person, RESERVATION.repaired_time       
+		FROM RESERVATION
+		JOIN MEMBER
+		ON RESERVATION.member_no = MEMBER.member_no
+		WHERE MEMBER.member_id = #{member_id}
+	</select>
+
+	<select id="getReservationList"	resultType="com.chavis.biz.vo.ReservationListVO">
+		/* reservatonMapper.getReservationList */
+		SELECT reservation_no, key, key_expire_time, member_mname, reservation.member_no,
+		       car_type, car_id, reservation_time, repaired_time, repaired_person
+		FROM MEMBER 
+		JOIN RESERVATION 
+		ON MEMBER.member_no = reservation.member_no
+		JOIN CAR
+		ON MEMBER.member_no = CAR.member_no
+		WHERE bodyshop_no = #{bodyshop_no}
+	</select>
+	
+	<select id="getRecentReservation" resultType="reservationVO">
+		/* reservationMapper.getRecentReservation */
+		SELECT * 
+		FROM RESERVATION
+		WHERE reservation_no = (SELECT MAX(reservation_no) FROM RESERVATION)
+	</select>
+
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="carMapper">
+
+	<select id="getPersonalCar" resultType="CarVO"
+		parameterType="CarVO">
+		/* carMapper.getPersonalCar */
+		SELECT * 
+		FROM CAR C
+		JOIN MEMBER M 
+		ON C.member_no = M.member_no
+		WHERE M.member_no = (SELECT member_no FROM MEMBER WHERE member_id= #{member_id})
+	</select>
+
+</mapper>

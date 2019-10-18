@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reservationMapper">
+
+	<!-- CREATE -->
+	<insert id="addReservation" parameterType="ReservationVO">
+		INSERT INTO RESERVATION (RESERVATION_NO, BODYSHOP_NO, MEMBER_NO, CAR_NO,
+		KEY, KEY_EXPIRE_TIME, RESERVATION_TIME, REPAIRED_TIME,
+		REPAIRED_PERSON)
+		VALUES (#{RESERVATION_ID}, #{BODYSHOP_NO}, #{MEMBER_NO}, #{CAR_NO},
+		#{KEY}, #{KEY_EXPIRE_TIME}, #{RESERVATION_TIME}, #{REPAIRED_TIME},
+		#{REPAIRED_PERSON})
+	</insert>
+
+	<!-- READ -->
+	<select id="getReservation" resultType="ReservationVO">
+		SELECT * FROM RESERVATION
+		WHERE
+		RESERVATION_NO = #{RESERVATION_NO}
+	</select>
+	
+	<!-- LIST -->
+	<select id="listReservation" resultType="ReservationVO">
+		SELECT * FROM
+		RESERVATION ORDER BY RESERVATION_NO DESC
+	</select>
+	
+	<!-- ListByID -->
+	<select id="listReservationByID" parameterType="ReservationVO" resultType="ReservationVO">
+		SELECT reservation_no, bodyshop_no, reservation_time,
+		repaired_time,repaired_person ,key FROM RESERVATION 
+		JOIN MEMBER ON
+		RESERVATION.member_no = MEMBER.member_no 
+		WHERE MEMBER.member_no =
+		(select member_no from member where member_id= #{member_id})
+		ORDER BY reservation_no;
+	</select>
+
+	<!-- UPDATE -->
+	<update id="updateReservation" parameterType="ReservationVO">
+		UPDATE reservation
+		SET repaired_time=#{repaired_time}, repaired_person=#{repaired_person} where reservation_no =#{reservation_no}
+	</update>
+
+	<!-- DELETE -->
+	<delete id="removeReservation">
+		DELETE FROM RESERVATION WHERE RESERVATION_NO =
+		#{RESERVATION_NO}
+	</delete>
+</mapper>

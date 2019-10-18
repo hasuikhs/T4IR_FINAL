@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias type="com.chavis.biz.vo.MemberVO"
+			alias="MemberVO" />
+		<typeAlias type="com.chavis.biz.vo.ReservationVO"
+			alias="ReservationVO" />
+		<typeAlias type="com.chavis.biz.vo.BodyshopVO"
+			alias="BodyshopVO" />
+		<typeAlias type="com.chavis.biz.vo.CarVO" 
+			alias="CarVO" />
+		<typeAlias type="com.chavis.biz.vo.WebTableVO"
+			alias="WebTableVO"/>
+		
+	</typeAliases>
+	<mappers>
+		<mapper resource="./mappers/car_mapper.xml" />
+		<mapper resource="./mappers/member_mapper.xml" />
+		<mapper resource="./mappers/reservation_mapper.xml" />
+		<mapper resource="./mappers/bodyshop_mapper.xml" />
+	</mappers>
+</configuration>

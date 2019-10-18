@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.github.anastr.speedview.SpeedViewActivity"
+    android:background="@color/black">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_weight="6">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+ ></LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="9"
+            >
+
+            <com.github.anastr.speedviewlib.TubeSpeedometer
+                android:id="@+id/speedometer1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                app:sv_maxSpeed="1000"
+                app:sv_minSpeed="0"
+                app:sv_speedTextColor="@color/white"
+                app:sv_textSize="20dp"
+                app:sv_speedTextSize="40sp"
+                app:sv_speedTextTypeface="fonts/James-Almacen.ttf"
+                app:sv_textColor="@color/white"
+                app:sv_unitTextColor="@color/white"
+                app:sv_withTremble="false"
+                app:sv_lowSpeedColor="#FF0000"
+                app:sv_mediumSpeedColor="#FF0000"
+                app:sv_highSpeedColor="#FF0000"
+                app:sv_speedometerBackColor="#ffffff"
+                app:sv_speedTextPosition="CENTER"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            android:gravity="center|left">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/cardview_light_background"
+                android:text="주행거리"
+                android:textSize="30dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_weight="9">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <com.github.anastr.speedviewlib.TubeSpeedometer
+                android:id="@+id/speedometer2"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:layout_gravity="left"
+                android:layout_weight="1"
+                app:sv_textSize="15dp"
+                app:sv_textColor="@color/white"
+                app:sv_speedTextColor="@color/white"
+                app:sv_unitTextColor="@color/white"
+                app:sv_speedTextSize="30sp"
+                app:sv_speedTextTypeface="fonts/James-Almacen.ttf"
+                app:sv_withTremble="false"
+                app:sv_unit="%"
+                app:sv_lowSpeedColor="#FF0000"
+                app:sv_mediumSpeedColor="#FF0000"
+                app:sv_highSpeedColor="#FF0000"
+                app:sv_speedometerBackColor="#ffffff"
+                app:sv_speedTextPosition="CENTER"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="left|center"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/cardview_light_background"
+                android:textSize="20dp"
+                android:text="엔진오일 점도">
+            </TextView>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="right|center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/cardview_light_background"
+                android:text="냉각수 잔량"
+                android:textSize="20dp">
+
+            </TextView>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <com.github.anastr.speedviewlib.TubeSpeedometer
+                android:id="@+id/speedometer3"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_weight="1"
+                app:sv_textColor="@color/white"
+                app:sv_unitTextColor="@color/white"
+                app:sv_textSize="15dp"
+                app:sv_speedTextColor="@color/white"
+                app:sv_speedTextSize="30sp"
+                app:sv_speedTextTypeface="fonts/James-Almacen.ttf"
+                app:sv_withTremble="false"
+                app:sv_unit="%"
+                app:sv_lowSpeedColor="#FF0000"
+                app:sv_mediumSpeedColor="#FF0000"
+                app:sv_highSpeedColor="#FF0000"
+                app:sv_speedometerBackColor="#ffffff"
+                app:sv_speedTextPosition="CENTER"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

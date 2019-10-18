@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bodyshopMapper">
+
+	<select id="bodyshopLogin" parameterType="BodyshopVO"
+		resultType="BodyshopVO">
+		/* bodyshopMapper.bodyshopLogin */
+		SELECT * 
+		FROM BODYSHOP
+		WHERE bodyshop_id = #{bodyshop_id}
+		AND	bodyshop_pw = #{bodyshop_pw}
+	</select>
+	
+	<select id="getNo" resultType="Integer">
+		/* bodyshopMapper.getNo */
+		SELECT NVL(MAX(bodyshop_no), 0) + 1
+		FROM BODYSHOP
+	</select>
+	
+	<insert id="addBodyshop" parameterType="BodyshopVO">
+		/* bodyshopMapper.addBodyshop */
+		INSERT INTO
+		BODYSHOP(bodyshop_no, bodyshop_id, bodyshop_pw, bodyshop_name, bodyshop_address)
+		VALUES(#{bodyshop_no}, #{bodyshop_id}, #{bodyshop_pw}, #{bodyshop_name}, #{bodyshop_address})
+	</insert>
+
+	<select id="getBodyshoplist" resultType="Bodyshopvo">
+		/* bodyshopMapper.getBodyshoplist */
+		SELECT * FROM BODYSHOP
+	</select>
+	
+	<select id="findBodyshopID" parameterType="String" resultType="String">
+		/* bodyshopMapper.findBodyshopID */
+		SELECT bodyshop_id
+		FROM BODYSHOP
+		WHERE bodyshop_name = #{bodyshop_name}
+	</select>
+		
+	<select id="findBodyshopPW" parameterType="map" resultType="String">
+		/* bodyshopMapper.findBodyshopPW */
+		SELECT bodyshop_pw
+		FROM BODYSHOP
+		WHERE bodyshop_name = #{bodyshop_name}
+		AND bodyshop_id = #{bodyshop_id}
+	</select>
+
+</mapper>

@@ -517,13 +517,221 @@ public class CarController {
 
 ### 4.1 VO
 
+```java
+public class ReservationVO {
+
+	private int reservation_no;
+	private int bodyshop_no;
+	private int member_no;
+	private String key;
+	private String key_expire_time;
+	private String reservation_time;
+	private String repaired_time;
+	private String repaired_person;
+	private String tire;
+	private String cooler;
+	private String engine_oil;
+	private String wiper;
+	private String bodyshop_name;
+    
+    // constructor
+    // getter & setter
+    
+}
+```
+
 ### 4.2 reservation_mapper.xml
+
+```xml
+<mapper namespace="reservationMapper">
+
+	<!-- CREATE -->
+	<insert id="addReservation" parameterType="map">
+		/* reservationMapper.addReservation */
+		MERGE INTO 
+		RESERVATION USING 
+		DUAL ON (reservation_time = #{reservation_time} 
+        			and bodyshop_no= #{bodyshop_no} ) 
+		WHEN NOT MATCHED THEN 
+		INSERT (reservation_no, bodyshop_no, member_no, key, 
+        		reservation_time, repaired_time ) 
+		VALUES ((SELECT NVL(MAX(reservation_no), 0) + 1 FROM RESERVATION),
+        		 #{bodyshop_no},
+        		 (SELECT member_no FROM MEMBER WHERE member_id =#{member_id}),
+        		 #{key}, #{reservation_time}, #{repaired_time})
+	</insert>
+
+	...
+</mapper>
+```
+
+- 이번 SQL도 생각했던 대로 돌아가지 않아 오류를 해결하기 위해 SQL 문법을 바꾸었다.
 
 ### 4.3 DAO
 
+#### 4.3.1 Interface
+
+```java
+public interface ReservationDAO {
+	// Create
+	int addReservation(Map<String, String> reservation);
+
+	// ListByID
+	List<ReservationVO> getReservationByID(String member_id);
+
+	// ListByBodyshopNo
+	List<ReservationVO> getReservationByBodyshopNo(int bodyshop_no);
+
+	// ListReservationForWeb
+	List<WebTableVO> getReservationForWeb(int bodyshop_no);
+
+	ReservationVO getRecentReservation();
+}
+```
+
+#### 4.3.2 Implements
+
+```java
+@Component("reservationmybatis")
+public class ReservationDAO_MyBatis implements ReservationDAO {
+
+	public static Logger log = LoggerFactory.getLogger(ReservationDAO_MyBatis.class);
+	
+	@Autowired
+	SqlSession sqlSession;
+
+	public ReservationDAO_MyBatis() {
+		log.info("ReservationDAO 시작");
+	}
+
+	@Override
+	public int addReservation(Map<String, String> reservation) {
+		return sqlSession.insert("reservationMapper.addReservation", reservation);
+	}
+
+	@Override
+	public List<ReservationVO> getReservationByBodyshopNo(int bodyshop_no) {
+		return sqlSession.selectList("reservationMapper.getReservationByBodyshopNo", bodyshop_no);
+	}
+
+	@Override
+	public List<WebTableVO> getReservationForWeb(int bodyshop_no) {
+		return sqlSession.selectList("reservationMapper.getReservationForWeb", bodyshop_no);
+	}
+
+	@Override
+	public List<ReservationVO> getReservationByID(String member_id) {
+		return sqlSession.selectList("reservationMapper.listReservationByID", member_id);
+	}
+
+	@Override
+	public ReservationVO getRecentReservation() {
+		return sqlSession.selectOne("reservationMapper.getRecentReservation");
+	}
+}
+```
+
 ### 4.4 Service
 
+#### 4.4.1 Interface
+
+```java
+public interface ReservationService {
+	// Create
+	int addReservation(Map<String, String> map) throws SQLException;
+
+	// ListByID
+	List<ReservationVO> getReservationByID(String member_id);
+
+    // ListByBodyshopNo
+    List<ReservationVO> getReservationByBodyshopNo(int bodyshop_no);
+    
+    // ListForWebTable
+    List<WebTableVO> getReservationForWeb(int bodyshop_no);
+}
+```
+
+#### 4.4.2 Implements
+
+```java
+@Service("reservationservice")
+public class ReservationServiceImpl implements ReservationService {
+
+	private static Logger log = LoggerFactory.getLogger(ReservationServiceImpl.class);
+
+	@Resource(name = "reservationmybatis")
+	ReservationDAO dao;
+
+	@Autowired
+	ApplicationContext context;
+
+	public ReservationServiceImpl() {
+		log.info("ReservationService 시작");
+	}
+
+	public ReservationServiceImpl(ReservationDAO dao) {
+		super();
+		this.dao = dao;
+	}
+
+	@Transactional(rollbackFor = Exception.class) 
+	@Override
+	public int addReservation(Map<String, String> reservation) throws SQLException{
+		return dao.addReservation(reservation);
+	}
+
+    @Override
+	public List<ReservationVO> getReservationByBodyshopNo(int bodyshop_no) {
+		return dao.getReservationByBodyshopNo(bodyshop_no);
+	}
+
+	@Override
+	public List<ReservationVO> getReservationByID(String member_id) {
+		return dao.getReservationByID(member_id);
+	}
+
+	@Override
+	public List<WebTableVO> getReservationForWeb(int bodyshop_no) {
+		return dao.getReservationForWeb(bodyshop_no);
+	}	
+}
+```
+
 ### 4.5 Controller
+
+```java
+@RestController
+public class ReservationController {
+
+	public static Logger log = LoggerFactory.getLogger(ReservationController.class);
+	
+    @Autowired
+	ReservationService service;
+    
+	@Autowired
+	BodyshopService bservice;
+
+	@RequestMapping(value = "/Reservation/add.do", method = RequestMethod.POST)
+	public String addReservation2(@RequestBody Map<String, String> map) {
+		log.info("/Reservation/add2.do 실행");
+		map.put("repaired_time", "NO");
+		int result;
+		try {
+			result = service.addReservation(map);
+			if (result == 1) {
+				return "SUCCESS";
+
+			} else {
+				return "FAIL";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "FAIL";
+		}
+	}
+	...
+}
+```
 
 ### 4.6 Car Test
 
@@ -537,7 +745,15 @@ public class CarController {
 
 ### 5.3 DAO
 
+#### 5.3.1 Interface
+
+#### 5.3.2 Implements
+
 ### 5.4 Service
+
+#### 5.4.1 Interface
+
+#### 5.4.2 Implements
 
 ### 5.5 Controller
 

@@ -609,25 +609,7 @@ public class ReservationDAO_MyBatis implements ReservationDAO {
 		return sqlSession.insert("reservationMapper.addReservation", reservation);
 	}
 
-	@Override
-	public List<ReservationVO> getReservationByBodyshopNo(int bodyshop_no) {
-		return sqlSession.selectList("reservationMapper.getReservationByBodyshopNo", bodyshop_no);
-	}
-
-	@Override
-	public List<WebTableVO> getReservationForWeb(int bodyshop_no) {
-		return sqlSession.selectList("reservationMapper.getReservationForWeb", bodyshop_no);
-	}
-
-	@Override
-	public List<ReservationVO> getReservationByID(String member_id) {
-		return sqlSession.selectList("reservationMapper.listReservationByID", member_id);
-	}
-
-	@Override
-	public ReservationVO getRecentReservation() {
-		return sqlSession.selectOne("reservationMapper.getRecentReservation");
-	}
+	...
 }
 ```
 
@@ -674,26 +656,12 @@ public class ReservationServiceImpl implements ReservationService {
 		this.dao = dao;
 	}
 
-	@Transactional(rollbackFor = Exception.class) 
 	@Override
 	public int addReservation(Map<String, String> reservation) throws SQLException{
 		return dao.addReservation(reservation);
 	}
 
-    @Override
-	public List<ReservationVO> getReservationByBodyshopNo(int bodyshop_no) {
-		return dao.getReservationByBodyshopNo(bodyshop_no);
-	}
-
-	@Override
-	public List<ReservationVO> getReservationByID(String member_id) {
-		return dao.getReservationByID(member_id);
-	}
-
-	@Override
-	public List<WebTableVO> getReservationForWeb(int bodyshop_no) {
-		return dao.getReservationForWeb(bodyshop_no);
-	}	
+    ...	
 }
 ```
 
@@ -733,7 +701,29 @@ public class ReservationController {
 }
 ```
 
-### 4.6 Car Test
+### 4.6 Reservation Test
+
+- 이 테스트는 같은 시간대에 예약이 들어올시에 예약이 실패가 된다.
+
+- 예약 실패시
+
+  ![image-20191115144615218](README.assets/image-20191115144615218.png)
+
+  ![image-20191115144638724](README.assets/image-20191115144638724.png)
+
+  - 반환값
+
+  ![image-20191115144703907](README.assets/image-20191115144703907.png)
+
+- 예약 성공시
+
+  ![image-20191115144737176](README.assets/image-20191115144737176.png)
+
+  ![image-20191115144758253](README.assets/image-20191115144758253.png)
+
+  - 반환값
+
+  ![image-20191115144817072](README.assets/image-20191115144817072.png)
 
 -----
 
@@ -741,20 +731,172 @@ public class ReservationController {
 
 ### 5.1 VO
 
+```java
+public class BodyshopVO {
+   
+   private int bodyshop_no;
+   private String bodyshop_id;
+   private String bodyshop_pw;
+   private String bodyshop_name;
+   private String bodyshop_address;
+   private String bodyshop_lat;
+   private String bodyshop_long;
+   
+   // constructor
+    
+    // getter & setter
+}
+```
+
 ### 5.2 bodyshop_mapper.xml
+
+```xml
+<mapper namespace="bodyshopMapper">
+
+	<select id="bodyshopLogin" parameterType="BodyshopVO"
+		resultType="BodyshopVO">
+		/* bodyshopMapper.bodyshopLogin */
+		....
+	</select>
+	
+	<select id="getNo" resultType="Integer">
+		/* bodyshopMapper.getNo */
+		SELECT NVL(MAX(bodyshop_no), 0) + 1
+		FROM BODYSHOP
+	</select>
+	
+	<insert id="addBodyshop" parameterType="BodyshopVO">
+		/* bodyshopMapper.addBodyshop */
+		...
+	</insert>
+
+	<select id="getBodyshoplist" resultType="Bodyshopvo">
+		/* bodyshopMapper.getBodyshoplist */
+		SELECT * FROM BODYSHOP
+	</select>
+	
+	<select id="findBodyshopID" parameterType="String" resultType="String">
+		/* bodyshopMapper.findBodyshopID */
+		...
+	</select>
+		
+	<select id="findBodyshopPW" parameterType="map" resultType="String">
+		/* bodyshopMapper.findBodyshopPW */
+		...
+	</select>
+
+</mapper>
+```
+
+- Bodyshop의 SQL 문은 쉬운 문법으로만 작성되었으므로 넘어가자.
 
 ### 5.3 DAO
 
 #### 5.3.1 Interface
 
+```java
+public interface ReservationDAO {
+	// Create
+	int addReservation(Map<String, String> reservation);
+
+	// ListByID
+	List<ReservationVO> getReservationByID(String member_id);
+
+	// ListByBodyshopNo
+	List<ReservationVO> getReservationByBodyshopNo(int bodyshop_no);
+
+	// ListReservationForWeb
+	List<WebTableVO> getReservationForWeb(int bodyshop_no);
+
+	ReservationVO getRecentReservation();
+}
+```
+
 #### 5.3.2 Implements
+
+```java
+@Component("reservationmybatis")
+public class ReservationDAO_MyBatis implements ReservationDAO {
+
+	public static Logger log = LoggerFactory.getLogger(ReservationDAO_MyBatis.class);
+	
+	@Autowired
+	SqlSession sqlSession;
+
+	public ReservationDAO_MyBatis() {
+		log.info("ReservationDAO 시작");
+	}
+
+	...
+}
+```
 
 ### 5.4 Service
 
 #### 5.4.1 Interface
 
+```java
+public interface BodyshopService {
+	BodyshopVO bodyshopLogin(String bodyshop_id, String bodyshop_pw);
+
+	int getNo();
+
+	void addBodyshop(BodyshopVO vo);
+
+	List<BodyshopVO> getBodyshoplist();
+
+	List<ReservationListVO> getReservationList(int member_no);
+
+	String findBodyshopID(Map<String, String> map);
+	
+	String findBodyshopPW(Map<String, String> map);
+}
+```
+
 #### 5.4.2 Implements
+
+```java
+@Service("bodyshopservice")
+public class BodyshopServiceImpl implements BodyshopService {
+
+	public static Logger log = LoggerFactory.getLogger(BodyshopServiceImpl.class);
+	
+	@Resource(name = "bodyshopmybatis")
+	BodyshopDAO dao;
+
+	@Autowired
+	ApplicationContext context;
+
+	...
+}
+```
 
 ### 5.5 Controller
 
-### 5.6 Car Test
+```java
+@RestController
+public class BodyshopController {
+
+	public static Logger log = LoggerFactory.getLogger(BodyshopController.class);
+
+	@Autowired
+	BodyshopService service;
+
+	int bodyshop_no;
+	AddressMethod am = new AddressMethod();
+
+	@RequestMapping(value = "/Bodyshop/login.do", method = RequestMethod.POST)
+	public BodyshopVO loginProc(@RequestBody Map<String, String> map, HttpServletRequest request) throws Exception {
+		log.info("/Bodyshop/login.do 실행");
+		BodyshopVO Bodyshop = service.bodyshopLogin(map.get("id"), map.get("pw"));
+		if (Bodyshop != null) {
+			return Bodyshop;
+		} else {
+			BodyshopVO tmp = new BodyshopVO();
+			tmp.setBodyshop_id("NO");
+			return tmp;
+		}
+	}
+	...
+}
+```
